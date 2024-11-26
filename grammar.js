@@ -15,15 +15,30 @@ const selector_ = RegExp("\\."+identifier_inner);
 const uint_inner = "(([1-9][0-9_]*)|(0(0|_)*))";
 const uint_ = RegExp(uint_inner);
 const float_ = RegExp(uint_inner+"\\."+uint_inner+"(e|E)"+uint_inner);
-const block_comment_ = /\{-.*-\}.*\n/u;
-const line_comment_dash_ = /--[^\n]*\n/u;
+const line_documentation_hypen_  = /-- \|[^\n]*\n/u;
+const line_comment_hypen_ = /--[^\n]*\n/u;
+const line_documentation_slash_  = /\/\/ \|[^\n]*\n/u;
 const line_comment_slash_ = /\/\/[^\n]*\n/u;
 
 
 module.exports = grammar({
   name: "octizys",
-  extras : $ => [$.spaces,$.comment],
-  word : $ =>  $.identifier,
+  extras : $ => [
+    $._spaces,
+    $.line_documentation_hypen,
+    $.line_documentation_slash,
+    $.line_comment_hypen,
+    $.line_comment_slash,
+    $.block_comment0,
+    $.block_comment1,
+    $.block_comment2,
+    $.block_comment3,
+    $.block_documentation0,
+    $.block_documentation1,
+    $.block_documentation2,
+    $.block_documentation3,
+  ],
+  word : $ =>  $._identifier,
 
   rules: {
     //This rule is named top in the rust grammar, 
@@ -35,17 +50,33 @@ module.exports = grammar({
           seq($.data_type,";"),
           seq($.alias_type,";"),
           seq($.new_type,";"),
-          seq($.function_declaration,";"),
+          $.class_declaration,
+          $.instance_definition,
+          $.function_definition,
         )
       )
     ),
 //--------------------------Common ----------------------------------
 
-    spaces : $ => token(/\s+/u),
+    _spaces : $ => token(/\s+/u),
 
-    comment : $ => choice(token(line_comment_slash_),token(line_comment_dash_),token(block_comment_)),
+    line_documentation_hypen: $ => token(prec(5,line_documentation_hypen_)),
+    line_documentation_slash: $ => token(prec(5,line_documentation_slash_)),
+    line_comment_hypen : $ => token(line_comment_hypen_),
+    line_comment_slash : $ => token(line_comment_slash_),
 
-    identifier : $ => token(identifier_),
+    block_comment0 : $ => token(prec(1,/\{-([^}]|[^-]\})*-\}/u)),
+    block_comment1 : $ => token(prec(2,/\{--([^}]|[^-](|-\}))*--\}/u)),
+    block_comment2 : $ => token(prec(3,/\{---([^}]|[^-](|-\}|--\}))*---\}/u)),
+    block_comment3 : $ => token(prec(4,/\{----([^}]|[^-](|-\}|--\}|---\}))*----\}/u)),
+
+    block_documentation0 : $ => token(prec(10,/\{-\|([^}]|[^-]\})*-\}/u)),
+    block_documentation1 : $ => token(prec(11,/\{--\|([^}]|[^-](|-\}))*--\}/u)),
+    block_documentation2 : $ => token(prec(12,/\{---\|([^}]|[^-](|-\}|--\}))*---\}/u)),
+    block_documentation3 : $ => token(prec(13,/\{----\|([^}]|[^-](|-\}|--\}|---\}))*----\}/u)),
+
+
+    _identifier : $ => token(identifier_),
     module_path : $ => token(module_path_),
 
     uint : $ => token(uint_),
@@ -57,13 +88,20 @@ module.exports = grammar({
 
     character : $ => token(/'.'/u),
 
-    local_variable : $ => $.identifier,
+    local_variable : $ => $._identifier,
+
+    //TODO: add keywords
+    label: $ => $._identifier,
 
     imported_variable : $ => seq($.module_path,$.local_variable),
 
     infix_identifier : $ => token(infix_identifier),
 
     selector : $ => token(selector_),
+
+    multiplicity_literal : $ => token("mutable"),
+
+    multiplicity_variable : $ => token(identifier_inner+"'"),
 
 //--------------------------Import ----------------------------------
 
@@ -96,61 +134,121 @@ module.exports = grammar({
       "String",
     ),
 
-    type_variable : $ => choice($.local_variable, $.imported_variable),
+    //TODO: maybe we need effects instead of Exception or 
+    //only the particular `log` effect 
+    kind : $ => choice(
+      "Type",
+      "Exception",
+    ),
+
+    type_multiplicity : $ => choice($.multiplicity_variable,$.multiplicity_literal),
+
+    type_variable : $ => choice(
+      $.local_variable, 
+      $.imported_variable
+    ),
+
+    // we need to syntactically separate both as we can have `a b` in a type 
+    // if `a` is a type the this is `application(a,b)` but if it is a 
+    // multiplicity this is `type(multiplicity=a, b)`, so instead we do 
+    // `a' b` to mean type(multiplicity=a,b).
+    // Note that row variables doesn't have this problem
+    type_parameter : $=> choice(
+      $.local_variable,
+      seq($.local_variable,":",$.kind),
+      seq("(",$.local_variable,":",$.kind,")"),
+      $.multiplicity_variable
+    ),
 
     //TODO: sync with grammar, the leading comma is not optional in rust
-    type_tuple : $ => seq("(",$.type_expression,repeat1(seq(",",$.type_expression)),optional(","),")"),
 
-    type_record_item : $ => seq($.identifier,":",$.type_expression),
+    type_tuple_item : $ => seq(",", optional($.type_multiplicity), $._type_expression),
 
-    type_record : $ => seq("{", $.type_record_item, repeat(seq(",",$.type_record_item)) ,optional(","),"}"),
+    type_tuple : $ => seq("(",$._type_expression,repeat1($.type_tuple_item),optional(","),")"),
 
-    type_atom : $ => choice(
+    type_record_item : $ => seq($.label,":", optional($.type_multiplicity), $._type_expression),
+    
+    type_record : $ => seq(
+      "{",
+      $.type_record_item,
+      repeat(seq(",",$.type_record_item)),
+      optional(","),
+      optional(seq("|","...")),
+      "}"
+    ),
+
+    type_parens : $ => seq("(",$._type_expression,")"),
+
+    _type_atom : $ => choice(
       $.type_base,
       $.type_variable,
       $.type_tuple,
       $.type_record,
-      seq("(",$.type_expression,")")
+      $.type_parens,
+
     ),
 
-    type_application : $ => choice(seq($.type_atom , repeat1($.type_atom)),$.type_atom),
+    type_application : $ => seq($._type_atom , repeat1($._type_atom)),
 
-    type_arrow : $ => choice(seq($.type_application,repeat1(seq("->",$.type_application))),$.type_application),
-    type_scheme : $ => choice(seq("forall",repeat1($.local_variable),".",$.type_arrow),$.type_arrow),
+    _maybe_type_application  : $ => choice($.type_application,$._type_atom),
 
-    type_expression : $=> $.type_scheme,
+    type_arrow : $ => seq($._maybe_type_application,"->",$._maybe_type_application),
+
+    _maybe_type_arrow  : $ => choice($.type_arrow,$._maybe_type_application),
+
+    //TODO: can we add a local such that we can have the reference?
+    type_scheme_forall : $ => seq("forall",repeat1($.type_parameter)),
+
+    type_scheme : $ => seq($.type_scheme_forall,".",$._type_expression),
+
+    _type_expression : $ => choice(
+      $.type_scheme,
+      $._maybe_type_arrow
+    ),
+
 
 
 //--------------------------Pattern ----------------------------------
 
     pattern_variable : $ => choice($.local_variable, $.imported_variable),
 
-    //TODO: handle negative integers.
-    pattern_literal: $ => choice($.uint,$.float_,$.string,$.character),
+    pattern_literal: $ => choice(seq(optional("-"),$.uint),$.float_,$.string,$.character),
 
     pattern_hole : $ => "_",
 
     //TODO: sync with grammar, the leading comma is not optional in rust
-    pattern_tuple : $ => seq("(",$.pattern,repeat1(seq(",",$.pattern)),optional(","),")"),
+    pattern_tuple : $ => seq("(",$._pattern,repeat1(seq(",",$._pattern)),optional(","),")"),
 
-    pattern_record_item : $ => seq($.identifier,"=",$.pattern),
+    pattern_record_item : $ => seq($.label,"=",$._pattern),
 
-    pattern_record : $ => seq("{", $.pattern_record_item, repeat(seq(",",$.pattern_record_item)) ,optional(choice(",","...")),"}"),
+    pattern_record : $ => seq(
+      "{",
+      $.pattern_record_item, 
+      repeat(seq(",",$.pattern_record_item)),
+      optional(seq(",",optional("..."))),
+      "}"
+    ),
+      
+    pattern_parens : $ => seq("(",$._pattern,")"),
 
-    pattern_atom : $ => choice(
+    _pattern_atom : $ => choice(
       $.pattern_literal,
       $.pattern_variable,
       $.pattern_hole,
       $.pattern_tuple,
       $.pattern_record,
-      seq("(",$.pattern,")"),
+      $.pattern_parens,
     ),
 
-    pattern_bind : $ => choice(seq($.local_variable, "@", $.pattern_atom),$.pattern_atom),
+    pattern_bind : $ => seq($.local_variable, "@", $._pattern_atom),
 
-    pattern_application : $ => seq($.pattern_variable, repeat($.pattern_bind)),
+    pattern_application : $ => seq($.pattern_variable,repeat1($._pattern_atom)),
 
-    pattern : $ => $.pattern_application,
+    _pattern : $ => choice(
+      $.pattern_application,
+      $.pattern_bind,
+      $._pattern_atom
+    ),
 
 //--------------------------Expression ----------------------------------
 
@@ -160,106 +258,162 @@ module.exports = grammar({
 
     expression_named_hole : $ => token(/_([1-9][0-9]*|(0(0|_)*))/u),
 
-    expression_tuple : $ => seq("(",$.expression,repeat1(seq(",",$.expression)),optional(","),")"),
+    expression_tuple : $ => seq("(",$._expression,repeat1(seq(",",$._expression)),optional(","),")"),
 
     //TODO: sync with rust grammar, use ":" in rust
-    expression_record_item : $ => seq($.identifier,optional(seq(":",$.pattern))),
+    expression_record_item : $ => seq($.label,optional(seq(":",$._expression))),
 
+    //TODO: support update of records with partial fields
+    //TODO: add record update syntax?
     expression_record : $ => seq("{", $.expression_record_item, repeat(seq(",",$.expression_record_item)) ,optional(","),"}"),
 
-    case_item : $ => seq($.pattern, "->", $.expression),
+    case_item : $ => seq($._pattern, "->", $._expression),
 
     expression_case : $ => seq(
       "case",
-      $.expression,
+      $._expression,
       "of",
       "{",
       seq($.case_item,repeat(seq(",",$.case_item)),optional(",")),
       "}",
     ),
 
-    expression_atom: $ => choice(
+    expression_parens : $ => seq("(",$._expression,optional(seq(":",$._type_expression)),")"),
+
+    _expression_atom : $ =>choice(
       $.expression_literal,
       $.expression_variable,
       $.expression_named_hole ,
       $.expression_tuple,
       $.expression_record,
       $.expression_case,
-      seq("(",$.expression,")")
+      $.expression_parens,
     ),
 
-    //TODO: fix the ? operator (see rust grammar)j
-    expression_selector : $ =>seq($.expression_atom, repeat1(seq($.selector,optional("?")))),
+    expression_selector : $ => seq($._expression_atom,$.selector),
 
-    expression_argument : $ => choice(
-      seq("@",$.type_atom),
+    _maybe_expression_selector : $ => choice(
       $.expression_selector,
-      seq($.expression_atom,optional("?")),
+      $._expression_atom
     ),
 
-    expression_application : $ => choice(
-      seq($.expression_selector, repeat($.expression_argument)),
-      seq($.expression_atom, repeat($.expression_argument))
+    expression_unary_postfix : $ => prec(40,seq($._maybe_expression_selector,"?")),
+
+    _maybe_expression_unary_postfix : $ => choice(
+      $.expression_unary_postfix,
+      $._maybe_expression_selector
     ),
 
-    expression_infix_application : $ => seq($.expression_application, optional(seq($.infix_identifier, $.expression_application))),
+    expression_type_argument : $ => seq("@",$._type_atom),
 
-    expression_unary_operator : $ => seq(
-      choice("-","!","#"),
-      $.expression_infix_application
+    _maybe_expression_application_argument : $ => choice(
+      $._maybe_expression_unary_postfix,
+      $.expression_type_argument
     ),
 
-    expression_binary_operator : $ => choice(
-      prec.left(30,seq($.expression,"|>",$.expression)), 
-      prec.left(30,seq($.expression,"<|",$.expression)), 
-      prec.left(29,seq($.expression,"*",$.expression)), 
-      prec.left(29,seq($.expression,"/",$.expression)), 
-      prec.left(29,seq($.expression,"%",$.expression)), 
-      prec.left(28,seq($.expression,"+",$.expression)), 
-      prec.left(28,seq($.expression,"-",$.expression)), 
-      prec.left(27,seq($.expression,"<<",$.expression)), 
-      prec.left(27,seq($.expression,">>",$.expression)), 
-      prec.left(26,seq($.expression,":",$.expression)), 
-      prec.left(25,seq($.expression,"<$>",$.expression)), 
-      prec.left(25,seq($.expression,"<$",$.expression)), 
-      prec.left(25,seq($.expression,"$>",$.expression)), 
-      //TODO: sync with rust grammar
-      prec.left(24,seq($.expression,"<*>",$.expression)), 
-      prec.left(24,seq($.expression,"*>",$.expression)), 
-      prec.left(24,seq($.expression,"<*",$.expression)), 
-      prec.left(23,seq($.expression,"==",$.expression)), 
-      prec.left(23,seq($.expression,"!=",$.expression)), 
-      prec.left(23,seq($.expression,"<=",$.expression)), 
-      prec.left(23,seq($.expression,">=",$.expression)), 
-      prec.right(22,seq($.expression,"&&",$.expression)), 
-      prec.right(21,seq($.expression,"||",$.expression)), 
-      prec.left(20,seq($.expression,"&",$.expression)), 
-      prec.right(19,seq($.expression,"$",$.expression)), 
+    expression_application : $ => seq(
+      $._maybe_expression_unary_postfix,
+      repeat1($._maybe_expression_application_argument)
     ),
 
-    let_binding : $ => seq($.pattern,optional(seq(":",$.type_expression)),"=",$.expression),
+    _maybe_expression_application : $ => choice(
+      $.expression_application,
+      $._maybe_expression_unary_postfix
+    ),
+
+    //This is above application as we want to be able to do : 
+    // `~ some boolean call` and get `negate (some boolean call)`
+    // instead of `(negate some) boolean call`
+    expression_unary: $ => choice(
+        prec(35,seq("~",$._maybe_expression_application)),
+        prec(35,seq("!",$._maybe_expression_application)),
+        //TODO: maybe we want to use this for pragmas?
+        prec(35,seq("#",$._maybe_expression_application)),
+    ),
+
+    _maybe_expression_unary : $ => choice(
+      $.expression_unary,
+      $._maybe_expression_application
+    ),
+
+    expression_binary : $=> choice(
+      prec.left(30 ,seq($._maybe_expression_unary,"|>" ,$._maybe_expression_unary)), 
+      prec.left(30 ,seq($._maybe_expression_unary,"<|" ,$._maybe_expression_unary)), 
+      prec.left(29 ,seq($._maybe_expression_unary,"*"  ,$._maybe_expression_unary)), 
+      prec.left(29 ,seq($._maybe_expression_unary,"/"  ,$._maybe_expression_unary)), 
+      prec.left(29 ,seq($._maybe_expression_unary,"%"  ,$._maybe_expression_unary)), 
+      prec.left(28 ,seq($._maybe_expression_unary,"+"  ,$._maybe_expression_unary)), 
+      prec.left(28 ,seq($._maybe_expression_unary,"-"  ,$._maybe_expression_unary)), 
+      prec.left(27 ,seq($._maybe_expression_unary,"<<" ,$._maybe_expression_unary)), 
+      prec.left(27 ,seq($._maybe_expression_unary,">>" ,$._maybe_expression_unary)), 
+      prec.left(26 ,seq($._maybe_expression_unary,":"  ,$._maybe_expression_unary)), 
+      prec.left(25 ,seq($._maybe_expression_unary,"<$>",$._maybe_expression_unary)), 
+      prec.left(25 ,seq($._maybe_expression_unary,"<$" ,$._maybe_expression_unary)), 
+      prec.left(25 ,seq($._maybe_expression_unary,"$>" ,$._maybe_expression_unary)), 
+      prec.left(24 ,seq($._maybe_expression_unary,"<*>",$._maybe_expression_unary)), 
+      prec.left(24 ,seq($._maybe_expression_unary,"*>" ,$._maybe_expression_unary)), 
+      prec.left(24 ,seq($._maybe_expression_unary,"<*" ,$._maybe_expression_unary)), 
+      prec.left(23 ,seq($._maybe_expression_unary,"==" ,$._maybe_expression_unary)), 
+      prec.left(23 ,seq($._maybe_expression_unary,"!=" ,$._maybe_expression_unary)), 
+      prec.left(23 ,seq($._maybe_expression_unary,"<=" ,$._maybe_expression_unary)), 
+      prec.left(23 ,seq($._maybe_expression_unary,">=" ,$._maybe_expression_unary)), 
+      prec.right(22,seq($._maybe_expression_unary,"&&" ,$._maybe_expression_unary)), 
+      prec.right(21,seq($._maybe_expression_unary,"||" ,$._maybe_expression_unary)), 
+      prec.left(20 ,seq($._maybe_expression_unary,"&"  ,$._maybe_expression_unary)), 
+      prec.right(19,seq($._maybe_expression_unary,"$"  ,$._maybe_expression_unary)), 
+      prec.right(15,seq($._maybe_expression_unary,$.infix_identifier,$._maybe_expression_unary)), 
+    ),
+
+    let_binding : $ => seq($._pattern,optional(seq(":",$._type_expression)),"=",$._expression),
 
     let_bindings : $ => seq($.let_binding,repeat(seq(",",$.let_binding)),optional(",")),
 
     expression_let : $ => choice(
-      $.expression_unary_operator,
-      $.expression_binary_operator,
-      seq("let",$.let_bindings,"in",$.expression),
+      seq("let",$.let_bindings,"in",$._expression),
     ),
 
-    expression : $ => $.expression_let,
+    lambda_parameter : $ => choice(
+      (seq(optional($.type_multiplicity),$.local_variable)),
+      seq("(", optional($.type_multiplicity),$.local_variable,":",$._type_expression ,")")
+    ),
+
+    expression_lambda : $ => seq("\\", repeat1($.lambda_parameter)  ,"->",$._expression),
+
+    _expression: $ => choice(
+      //$._maybe_expression_application
+      $.expression_binary,
+      $.expression_let,
+      $.expression_lambda,
+      $._maybe_expression_unary
+    ),
+
+    top_type_declaration_left: $ => 
+      seq(
+        field("name",$.local_variable),
+        repeat($.type_parameter)
+      ),
+
+    data_type_constructor_type : $ =>seq(
+      field("name",$.local_variable),
+      optional(field("type",$._type_expression))
+    ),
+
+    data_type_constructor_item : $ => seq(
+      field("separator", "|"),
+      $.data_type_constructor_type
+    ),
 
     data_type : $ => seq(
       optional("public"),
       "data",
-      $.local_variable,
-      repeat($.local_variable),
+      $.top_type_declaration_left,
       "=",
       choice(
         seq(
-          optional("|"),$.local_variable, optional($.type_expression),
+          optional("|"),
+          $.data_type_constructor_type,
           repeat(
-            seq("|",$.local_variable, optional($.type_expression))
+            $.data_type_constructor_item
           ), 
           optional("|")
         ),
@@ -270,32 +424,63 @@ module.exports = grammar({
     alias_type : $ => seq(
       optional("public"),
       "alias",
-      repeat1($.local_variable),
+      $.top_type_declaration_left,
       "=",
-      $.type_expression
+      $._type_expression
     ),
 
     new_type : $ => seq(
       optional("public"),
       "newtype",
-      repeat1($.local_variable),
+      $.top_type_declaration_left,
       "=",
-      $.local_variable,
-      $.type_expression
+      $.data_type_constructor_type
     ),
 
-    function_type: $ => choice(
-      seq($.local_variable, ":", $.type_application),
-      seq("(",$.local_variable, ":", $.type_expression,")"),
+    class_declaration : $ => seq(
+      optional("public"),
+      "class", 
+      $.top_type_declaration_left ,
+      "{",
+        repeat(seq($.function_declaration,";")),
+      "}",
+    ) ,
+
+    instance_definition : $ => seq(
+      optional("public"),
+      "instance", 
+      $.local_variable,
+      $.local_variable,
+      repeat($._type_atom),
+      "as",
+      "{",
+        repeat($.function_definition),
+      "}",
+    ) ,
+
+    function_parameter: $ => choice(
+      seq(optional($.type_multiplicity),$.local_variable, ":", $._type_atom),
+      seq("(",optional($.type_multiplicity),$.local_variable, ":", $._type_expression,")"),
     ),
+
+    function_type_scheme : $ => seq($.type_scheme_forall,"."),
+
+    function_body : $ => 
+      seq("{",$._expression,"}"),
 
     function_declaration : $ => seq(
-      $.local_variable, ":", 
-      repeat(seq($.function_type,"->")), $.type_application,
-      "=",
-      "{",
-      $.expression,
-      ")",
+      $.local_variable, 
+      ":", 
+      optional($.function_type_scheme),
+      //TODO: add classes here
+      repeat(seq($.function_parameter,"->")), 
+      optional($.type_multiplicity), $._type_atom,
     ),
+
+    function_definition : $ => seq(
+      $.function_declaration,
+      "=",
+      $.function_body,
+    )
   }
 });
