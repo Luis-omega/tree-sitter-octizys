@@ -213,7 +213,7 @@ module.exports = grammar({
     //TODO: sync with grammar, the leading comma is not optional in rust
     pattern_tuple : $ => seq("(",$._pattern,repeat1(seq(",",$._pattern)),optional(","),")"),
 
-    pattern_record_item : $ => seq($.label,"=",$._pattern),
+    pattern_record_item : $ => seq($.label, optional(seq("=",$._pattern))),
 
     pattern_record : $ => seq(
       "{",
