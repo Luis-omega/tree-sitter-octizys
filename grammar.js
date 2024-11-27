@@ -440,15 +440,25 @@ module.exports = grammar({
       "}",
     ) ,
 
+    instance_function : $ =>choice(
+      $.function_definition,
+      seq(
+        field("name",$.local_variable),
+        "=",
+        field("definition",choice($.local_variable,$.imported_variable)),
+        ";"
+      )
+    ),
+
     instance_definition : $ => seq(
       optional("public"),
       "instance", 
-      $.local_variable,
-      $.local_variable,
-      repeat($._type_atom),
+      field("instance_name",$.local_variable),
+      field("class_name",$.local_variable),
+      field("types",repeat($._type_atom)),
       "as",
       "{",
-        repeat($.function_definition),
+        field("definitions",repeat($.instance_function)),
       "}",
     ) ,
 
