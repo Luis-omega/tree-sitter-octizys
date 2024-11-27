@@ -1334,37 +1334,100 @@
   {
     "type": "instance_definition",
     "named": true,
-    "fields": {},
+    "fields": {
+      "class_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      },
+      "definitions": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "instance_function",
+            "named": true
+          }
+        ]
+      },
+      "instance_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      },
+      "types": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "type_base",
+            "named": true
+          },
+          {
+            "type": "type_parens",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "instance_function",
+    "named": true,
+    "fields": {
+      "definition": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "imported_variable",
+            "named": true
+          },
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
-      "required": true,
+      "multiple": false,
+      "required": false,
       "types": [
         {
           "type": "function_definition",
-          "named": true
-        },
-        {
-          "type": "local_variable",
-          "named": true
-        },
-        {
-          "type": "type_base",
-          "named": true
-        },
-        {
-          "type": "type_parens",
-          "named": true
-        },
-        {
-          "type": "type_record",
-          "named": true
-        },
-        {
-          "type": "type_tuple",
-          "named": true
-        },
-        {
-          "type": "type_variable",
           "named": true
         }
       ]

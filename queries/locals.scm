@@ -22,16 +22,15 @@
 (type_variable) @local.reference
 
 ( type_record_item
-  (label)
+  (label) @local.definition
   ":"
   (type_multiplicity
     (multiplicity_variable) @local.reference
   )
-  _
+  _ @local.definition.associated
 )
 
 (type_scheme) @local.scope
-
 
 (pattern_variable
   (imported_variable) @local.reference
@@ -40,6 +39,20 @@
 (pattern_application
   (pattern_variable) @local.reference
   (_)
+)
+
+(pattern_record_item
+  (label) @local.definition.var @local.reference
+)
+
+(expression_record_item
+  (label) @local.definition.var @local.reference
+)
+
+(expression_record_item
+  (label) @local.reference
+  ":"
+  _
 )
 
 (expression_variable) @local.reference
@@ -60,14 +73,14 @@
 (expression_let) @local.scope
 
 (lambda_parameter
-  (local_variable) @local.definition.variable
+  (local_variable) @local.definition.var
 )
 
 (lambda_parameter
   "("
-  (local_variable) @local.definition.variable
+  (local_variable) @local.definition.var
   ":"
-  (_)
+  (_) @local.definition.associated
   ")"
 )
 
@@ -89,14 +102,14 @@
 (function_parameter
   (local_variable) @local.definition.parameter
   ":"
-  (_)
+  (_) @local.definition.associated
 )
 
 (function_parameter
   "("
   (local_variable) @local.definition.parameter
   ":"
-  (_)
+  (_) @local.definition.associated
   ")"
 )
 
@@ -105,7 +118,7 @@
   ":"
   (_)?
   (_)*
-  (_)
+  (_) @local.definition.associated
 )
 
 (function_definition)@local.scope

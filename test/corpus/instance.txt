@@ -1,0 +1,23 @@
+=================
+instance
+=================
+
+instance nothing Nothing as{
+  none=some::none;
+}
+
+---
+
+(source_file
+  (instance_definition
+    instance_name: (local_variable)
+    class_name: (local_variable)
+    definitions: (instance_function
+      name: (local_variable)
+      definition: (imported_variable
+        (module_path)
+        (local_variable)
+      )
+    )
+  )
+)

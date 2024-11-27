@@ -269,7 +269,7 @@
   (local_variable) @variable
   (local_variable) @variable
   _
-  "as"
+  "as"  @type.definition
   "{"
   _
   "}"
