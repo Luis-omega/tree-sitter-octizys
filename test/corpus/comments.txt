@@ -1,0 +1,144 @@
+==================||
+Slash line comment
+==================||
+
+// this is a comment
+
+---||
+
+(source_file
+  (line_comment_slash)
+)
+
+==================||
+Slash line documentation
+==================||
+
+// |this is a documentation
+
+---||
+
+(source_file
+  (line_documentation_slash)
+)
+
+
+==================||
+Hypen line comment
+==================||
+
+// this is a comment
+
+---||
+
+(source_file
+  (line_comment_slash)
+)
+
+==================||
+Hypen line documentation
+==================||
+
+-- |this is a documentation
+
+---||
+
+(source_file
+  (line_documentation_hypen)
+)
+
+==================||
+block0 comment
+==================||
+
+{- this is a comment -}
+
+---||
+
+(source_file
+  (block_comment0)
+)
+
+==================||
+block1 comment
+==================||
+
+{-- this is a comment --}
+
+---||
+
+(source_file
+  (block_comment1)
+)
+
+==================||
+block2 comment
+==================||
+
+{--- this is a comment ---}
+
+---||
+
+(source_file
+  (block_comment2)
+)
+
+==================||
+block3 comment
+==================||
+
+{---- this is a comment ----}
+
+---||
+
+(source_file
+  (block_comment3)
+)
+
+==================||
+block0 documentation
+==================||
+
+{-| this is a comment -}
+
+---||
+
+(source_file
+  (block_documentation0)
+)
+
+==================||
+block1 documentation
+==================||
+
+{--| this is a comment --}
+
+---||
+
+(source_file
+  (block_documentation1)
+)
+
+==================||
+block2 documentation
+==================||
+
+{---| this is a comment ---}
+
+---||
+
+(source_file
+  (block_documentation2)
+)
+
+==================||
+block3 documentation
+==================||
+
+{----| this is a comment ----}
+
+---||
+
+(source_file
+  (block_documentation3)
+)

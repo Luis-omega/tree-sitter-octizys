@@ -1,0 +1,95 @@
+==================
+zero
+==================
+
+do_nothing : Unit = { 0 }
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (type_variable
+        (local_variable)
+      )
+    )
+    (function_body
+      (expression_literal
+        (uint)
+      )
+    )
+
+  )
+)
+
+==================
+one
+==================
+
+do_nothing : Unit = { 1 }
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (type_variable
+        (local_variable)
+      )
+    )
+    (function_body
+      (expression_literal
+        (uint)
+      )
+    )
+
+  )
+)
+
+==================
+zeros
+==================
+
+do_nothing : Unit = { 0_000_0__0 }
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (type_variable
+        (local_variable)
+      )
+    )
+    (function_body
+      (expression_literal
+        (uint)
+      )
+    )
+
+  )
+)
+
+==================
+long number
+==================
+
+do_nothing : Unit = { 1_003_4_0__0 }
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (type_variable
+        (local_variable)
+      )
+    )
+    (function_body
+      (expression_literal
+        (uint)
+      )
+    )
+
+  )
+)

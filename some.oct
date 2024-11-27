@@ -1,0 +1,46 @@
+
+
+// asdf 
+import unqualified some::dfder::(dser,asdf) as dfs::asdf
+
+// asfd
+import some() as sfsdf;
+
+{-| some  sdfsf so -}
+
+alias Nat2 = Nat asdf sf;
+
+public newtype RecordExample a3 b =  Example1 {one:a33};
+
+-- public data Nat a b c d = Z asdf::asdf::sfsdf ASFD sadf asdfsadf dsf (asdf -> asdf) | S Nat;
+
+-- f: n3: Nat -> Nat = { 0 }
+
+//Comment
+public data Some asd = asdf ;
+
+v : Nat = {0}
+
+//Some
+add : forall j .  n:Nat-> m:Nat -> Nat 
+= {
+  case n of {
+    Z -> m Z,
+    v -> v,
+    S n2 -> S $ add n2 m asdf j
+      (let
+        asf : asdf = asfd,
+      in 
+        let
+          a : b = c,
+        in
+         d
+      )
+    }
+}
+
+//TODO: asd
+data a b c d =
+  | some a
+;
+

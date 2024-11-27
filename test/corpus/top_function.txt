@@ -1,0 +1,23 @@
+=4_0================
+top function
+==================
+
+do_nothing : Unit = { unit}
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (type_variable
+        (local_variable)
+      )
+    )
+    (function_body
+      (expression_variable
+        (local_variable)
+      )
+    )
+
+  )
+)

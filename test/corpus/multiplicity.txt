@@ -1,0 +1,52 @@
+==================
+lexer of multiplicity literal
+==================
+
+a : mutable t : w-> j = { 0 }
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (function_parameter
+        (type_multiplicity (multiplicity_literal))
+        (local_variable)
+        (type_variable (local_variable))
+      )
+      (type_variable (local_variable))
+    )
+    (function_body
+      (expression_literal
+        (uint)
+      )
+    )
+  )
+)
+
+==================
+lexer of multiplicity parameters
+==================
+
+a : n' t : w -> j = { 0 }
+
+---
+(source_file
+  (function_definition
+    (function_declaration
+      (local_variable)
+      (function_parameter
+        (type_multiplicity (multiplicity_variable))
+        (local_variable)
+        (type_variable (local_variable))
+      )
+      (type_variable (local_variable))
+    )
+    (function_body
+      (expression_literal
+        (uint)
+      )
+    )
+  )
+)
+
