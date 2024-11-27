@@ -7,14 +7,8 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-const identifier_inner = "\\p{XID_Start}(_|\\p{XID_Continue})*"
-const identifier_ = RegExp(identifier_inner);
-const module_path_ = RegExp("((" + identifier_inner+")::)+");
-const infix_identifier = RegExp("`"+identifier_inner+"`");
-const selector_ = RegExp("\\."+identifier_inner);
-const uint_inner = "(([1-9][0-9_]*)|(0(0|_)*))";
-const uint_ = RegExp(uint_inner);
-const float_ = RegExp(uint_inner+"\\."+uint_inner+"(e|E)"+uint_inner);
+const identifier_ = /\p{XID_Start}(_|\p{XID_Continue})*/u
+const uint_ = /(([1-9][0-9_]*)|(0(0|_)*))/u;
 const line_documentation_hypen_  = /-- \|[^\n]*\n/u;
 const line_comment_hypen_ = /--[^\n]*\n/u;
 const line_documentation_slash_  = /\/\/ \|[^\n]*\n/u;
@@ -77,11 +71,11 @@ module.exports = grammar({
 
 
     _identifier : $ => token(identifier_),
-    module_path : $ => token(module_path_),
+    module_path : $ => token(repeat1(seq(identifier_,"::"))),
 
     uint : $ => token(uint_),
 
-    float_ : $ => token(float_),
+    float_ : $ => token(seq(uint_,".",uint_,optional(seq(/e|E/u,uint_)))),
 
     //TODO: add scape sequences to strings and chars
     string : $ => token(/"([^"\n]|\\")*"/u),
@@ -95,13 +89,13 @@ module.exports = grammar({
 
     imported_variable : $ => seq($.module_path,$.local_variable),
 
-    infix_identifier : $ => token(infix_identifier),
+    infix_identifier : $ => token(seq("`",identifier_,"`")),
 
-    selector : $ => token(selector_),
+    selector : $ => token(seq(".",identifier_)),
 
     multiplicity_literal : $ => token("mutable"),
 
-    multiplicity_variable : $ => token(identifier_inner+"'"),
+    multiplicity_variable : $ => token(seq(identifier_,"'")),
 
 //--------------------------Import ----------------------------------
 
@@ -459,7 +453,7 @@ module.exports = grammar({
     ) ,
 
     function_parameter: $ => choice(
-      seq(optional($.type_multiplicity),$.local_variable, ":", $._type_atom),
+      seq(optional($.type_multiplicity),$.local_variable, ":", $._maybe_type_application),
       seq("(",optional($.type_multiplicity),$.local_variable, ":", $._type_expression,")"),
     ),
 
@@ -474,7 +468,7 @@ module.exports = grammar({
       optional($.function_type_scheme),
       //TODO: add classes here
       repeat(seq($.function_parameter,"->")), 
-      optional($.type_multiplicity), $._type_atom,
+      optional($.type_multiplicity), $._maybe_type_application,
     ),
 
     function_definition : $ => seq(
