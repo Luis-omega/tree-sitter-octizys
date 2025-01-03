@@ -71,7 +71,12 @@ module.exports = grammar({
 
 
     _identifier : $ => token(identifier_),
-    module_path : $ => token(repeat1(seq(identifier_,"::"))),
+
+    module_separator : $ => "::",
+
+    module_path_item : $ => seq($._identifier,$.module_separator),
+    module_path : $ => prec.right(repeat1($.module_path_item)),
+    //token(repeat1(seq(identifier_,"::"))),
 
     uint : $ => token(uint_),
 
@@ -106,9 +111,9 @@ module.exports = grammar({
     import_declaration:  $ =>  seq(
       "import" ,
       optional("unqualified"),
-      choice($.imported_variable,$.local_variable),
-      optional(seq("(",optional($.import_list),")")),
-      optional(seq("as", choice($.imported_variable,$.local_variable)))
+      field("path",$.module_path),
+      field("imports",optional(seq("(",optional($.import_list),")"))),
+      field("qualifier",optional(seq("as", choice($.imported_variable,$.local_variable))))
     ),
 
 //--------------------------Type ----------------------------------
@@ -182,16 +187,35 @@ module.exports = grammar({
 
     ),
 
-    type_application : $ => seq($._type_atom , repeat1($._type_atom)),
-
     _maybe_type_application  : $ => choice($.type_application,$._type_atom),
 
     type_arrow : $ => seq($._maybe_type_application,"->",$._maybe_type_application),
 
     _maybe_type_arrow  : $ => choice($.type_arrow,$._maybe_type_application),
 
+    type_application : $ => seq($._type_atom , repeat1($._type_atom)),
+
+    _type_class_argument : $ => //choice(
+      //$.type_multiplicity,
+      //$.imported_variable,
+      //$._type_atom
+    //),
+      "231?213",
+
+    type_class_constraint : $ => seq(
+      //field("class",$.type_variable),
+      "231?2132",
+      field("arguments", repeat($._type_class_argument))
+    ),
+
+    type_class_constraints : $ => repeat1(seq($.type_class_constraint,"=>")),
+
     //TODO: can we add a local such that we can have the reference?
-    type_scheme_forall : $ => seq("forall",repeat1($.type_parameter)),
+    type_scheme_forall : $ => seq(
+      "forall",
+      field("constraints",optional($.type_class_constraints)),
+      field("parameters",repeat1($.type_parameter))
+    ),
 
     type_scheme : $ => seq($.type_scheme_forall,".",$._type_expression),
 
