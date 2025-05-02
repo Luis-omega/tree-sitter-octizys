@@ -2,48 +2,14 @@
 [
   "("
   ")"
-  "{"
-  "}"
 ] @punctuation.bracket
 
 [
   ","
   ":"
   ";"
- ] @punctuation.delimiter
-
-[
-  "!"
-  "#"
-  "~"
-  "->"
   "="
-  "@"
-  "|>"
-  "<|"
-  "*"
-  "%"
-  "+"
-  "-"
-  "<<"
-  ">>"
-  ":"
-  "<$>"
-  "<$"
-  "$>"
-  "<*>"
-  "*>"
-  "<*"
-  "=="
-  "!="
-  "<="
-  ">="
-  "&&"
-  "||"
-  "&"
-  "$"
-  "?"
-] @operator
+ ] @punctuation.delimiter
 
 ((line_comment_hypen) @comment)
 ((line_comment_hypen)+ @comment.todo (#any-vim-match?  @comment.todo "^-- *TODO"))
@@ -67,134 +33,35 @@
 ((block_documentation3) @spell)
 
 
-((module_path) @module)
-
-((uint) @number)
-
-((float_) @number.float)
-
-((string) @string)
-
-((character) @character)
-
-((import_item) @variable)
-
-( (label) @variable.member)
-
-((multiplicity_literal) @keyword.modifier)
-
-(multiplicity_variable) @type.variable
-
-(import_declaration
-  ("import" @keyword.import)
-  ("unqualified" @keyword.import)?
-  [(
-    imported_variable (module_path) @module (local_variable) @module
-   )
-   (
-    (local_variable) @module
-   )
-  ]
-  ("(" (import_item)+ ")")?
-  (
-   ("as" @keyword.import) [
-                    (imported_variable) (local_variable)
-                   ]
-  )?
+(type_literal
+  "Int" @type.builtin
 )
 
-(kind _ @type.builtin)
+(type_literal
+  "Bool" @type.builtin
+)
+
+( (uint) @number)
 
 (type_variable
   (local_variable) @type.variable
 )
 
-(type_variable
-  (imported_variable (module_path) @module (local_variable) @type.variable)
-)
 
-(type_parameter
-  (local_variable) @variable.parameter
-)
-
-(type_record_item
-  (label) @variable.member
-  ":" @punctuation.delimiter
+(expression_if
+  "if" @keyword.conditional
   (_)
-)
-
-(type_record
-  "{"
+  "then" @keyword.conditional
   (_)
-  (_)*
-  ","?
-  ("|" "..."? @variable.parameter.builtin )?
-  "}"
+  "else" @keyword.conditional
 )
 
-(type_scheme_forall
-  "forall" @keyword.function
-  _
+(expression_literal
+  "True" @constant.builtin
 )
 
-(type_scheme
-  _
-  "." @punctuation.delimiter
-  _
-)
-
-( (pattern_hole) @variable_parameter.builtin
-)
-
-(pattern_variable
-    (local_variable) @variable.parameter
-)
-
-(pattern_variable
-  (imported_variable (module_path) @module (local_variable) @constructor )
-)
-
-(pattern_record
-  "{"
-  _
-  _*
-  ("," "..."? @keyword.modifier)?
-  "}"
-)
-
-(pattern_bind
-  _ "@" @keyword.modifier _
-)
-
-(pattern_application
-  (pattern_variable) @constructor (#set! priority 105)
-  (_)+
-)
-
-((expression_named_hole) @variable.parameter.builtin
-)
-
-(expression_case
-  "case" @keyword.conditional
-  (_)
-  "of" @keyword.conditional
-  "{"
-  (_)
-  "}"
-)
-
-(expression_selector
-  (_)
-  (selector) @function.method
-)
-
-(expression_type_argument
-  "@" @keyword.modifier _
-)
-
-((expression_application)
-  (expression_variable (_)) @function.call
-  (_)
+(expression_literal
+  "False" @constant.builtin
 )
 
 (expression_let
@@ -203,86 +70,34 @@
   "in" @keyword.function
 )
 
-(expression_lambda
+(parameter_alone
+  (local_variable) @variable.parameter
+)
+
+(parameter_with_type
+  (local_variable) @variable.parameter
+  ":"
+  (_) @type
+)
+
+(definition
+  (local_variable) @function
+)
+
+
+(expression_function
   "\\" @keyword.function
   (_)
   "->" @keyword.function
   (_)
 )
 
-(top_type_declaration_left
-  name : (local_variable) @constructor
-  (type_parameter)*
+(expression_application
+  function: (expression_variable) @function.call
+  arguments: (_)+
 )
 
-(data_type_constructor_type
-  name: (local_variable) @constructor
-  type: (_)?
-)
-
-(data_type_constructor_item
- separator: "|" @punctuation.delimiter
- _
-)
-
-( "public"? @keyword
-  "data" @type.definition
-  _
-  (("=") @operator)
-  [ (
-      "|" ? @punctuation.delimiter
-      _
-      _
-      "|"? @punctuation.delimiter
-    )
-   "|"? @punctuation.delimiter
-  ]
-)
-
-("public"? @keyword
-  "alias" @type.definition
-  _
-  "=" @operator
-  _
-)
-
-("public"? @keyword
-  "newtype" @type.definition
-  _
-  "=" @operator
-  _
-)
-
-("public"? @keyword
-  "interface" @keyword.type
-  _
-  "{"
-  _
-  "}"
-)
-
-("public"? @keyword
-  "instance" @keyword.type
-  (local_variable) @variable
-  (local_variable) @variable
-  _
-  "as"  @type.definition
-  "{"
-  _
-  "}"
-)
-
-(function_parameter
+(parameter_alone
   (local_variable) @variable.parameter
-  ":" @punctuation.delimiter
-  (_)
-)
-
-(function_parameter
-  "(" @punctuation.bracket
-  (local_variable) @variable.parameter
-  ":" @punctuation.delimiter
-  (_)
-  ")" @punctuation.bracket
 )
 
