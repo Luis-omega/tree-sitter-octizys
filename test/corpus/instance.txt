@@ -16,8 +16,4 @@ instance nothing Nothing as{
       name: (local_variable)
       definition: (imported_variable
         (module_path)
-        (local_variable)
-      )
-    )
-  )
-)
+        (local_variable)))))

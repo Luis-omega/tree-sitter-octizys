@@ -38,13 +38,13 @@ module.exports = grammar({
     //This rule is named top in the rust grammar, 
     //but tree sitter needs this name.
     source_file: $ => seq(
-      repeat(seq($.import_declaration,optional(";"))),
+      repeat(seq($.import_declaration,";")),
       repeat(
         choice(
           seq($.data_type,";"),
           seq($.alias_type,";"),
           seq($.new_type,";"),
-          $.class_declaration,
+          $.interface_declaration,
           $.instance_definition,
           $.function_definition,
         )
@@ -72,10 +72,11 @@ module.exports = grammar({
 
     _identifier : $ => token(identifier_),
 
-    module_separator : $ => "::",
+    module_separator : $ => "/",
 
-    module_path_item : $ => seq($._identifier,$.module_separator),
-    module_path : $ => prec.right(repeat1($.module_path_item)),
+    module_path : $ => choice(seq($.module_path, $._identifier, $.module_separator),seq($._identifier, $.module_separator)),
+
+    //module_path : $ => prec.right(repeat1($.module_path_item)),
     //token(repeat1(seq(identifier_,"::"))),
 
     uint : $ => token(uint_),
@@ -98,9 +99,9 @@ module.exports = grammar({
 
     selector : $ => token(seq(".",identifier_)),
 
-    multiplicity_literal : $ => token("mutable"),
+    multiplicity_literal : $ => token("'0|'1|'inf"),
 
-    multiplicity_variable : $ => token(seq(identifier_,"'")),
+    multiplicity_variable : $ => token(seq("'",identifier_)),
 
 //--------------------------Import ----------------------------------
 
@@ -118,26 +119,14 @@ module.exports = grammar({
 
 //--------------------------Type ----------------------------------
 
-    type_base : $ => choice(
-      "U8",
-      "U16",
-      "U32",
-      "U64",
-      "I8",
-      "I16",
-      "I32",
-      "I64",
-      "F32",
-      "F64",
-      "Char",
-      "String",
-    ),
 
     //TODO: maybe we need effects instead of Exception or 
     //only the particular `log` effect 
     kind : $ => choice(
       "Type",
       "Exception",
+      "Row",
+      "Ownership",
     ),
 
     type_multiplicity : $ => choice($.multiplicity_variable,$.multiplicity_literal),
@@ -150,11 +139,10 @@ module.exports = grammar({
     // we need to syntactically separate both as we can have `a b` in a type 
     // if `a` is a type the this is `application(a,b)` but if it is a 
     // multiplicity this is `type(multiplicity=a, b)`, so instead we do 
-    // `a' b` to mean type(multiplicity=a,b).
+    // `'a b` to mean type(multiplicity=a,b).
     // Note that row variables doesn't have this problem
     type_parameter : $=> choice(
       $.local_variable,
-      seq($.local_variable,":",$.kind),
       seq("(",$.local_variable,":",$.kind,")"),
       $.multiplicity_variable
     ),
@@ -179,7 +167,6 @@ module.exports = grammar({
     type_parens : $ => seq("(",$._type_expression,")"),
 
     _type_atom : $ => choice(
-      $.type_base,
       $.type_variable,
       $.type_tuple,
       $.type_record,
@@ -195,29 +182,28 @@ module.exports = grammar({
 
     type_application : $ => seq($._type_atom , repeat1($._type_atom)),
 
-    _type_class_argument : $ => //choice(
-      //$.type_multiplicity,
-      //$.imported_variable,
-      //$._type_atom
-    //),
-      "231?213",
-
-    type_class_constraint : $ => seq(
-      //field("class",$.type_variable),
-      "231?2132",
-      field("arguments", repeat($._type_class_argument))
+    _type_interface_argument : $ => choice(
+      $.type_multiplicity,
+      $.imported_variable,
+      $._type_atom
     ),
 
-    type_class_constraints : $ => repeat1(seq($.type_class_constraint,"=>")),
+    type_interface_constraint : $ => seq(
+      field("interface_name",$.type_variable),
+      field("arguments", repeat($._type_interface_argument))
+    ),
+
+    type_interface_constraints : $ => repeat1(seq($.type_interface_constraint,"=>")),
 
     //TODO: can we add a local such that we can have the reference?
     type_scheme_forall : $ => seq(
       "forall",
-      field("constraints",optional($.type_class_constraints)),
-      field("parameters",repeat1($.type_parameter))
+      field("parameters",repeat1($.type_parameter)),
     ),
 
-    type_scheme : $ => seq($.type_scheme_forall,".",$._type_expression),
+    type_scheme : $ => seq($.type_scheme_forall,".",
+      field("constraints",optional($.type_interface_constraints)),
+      $._type_expression),
 
     _type_expression : $ => choice(
       $.type_scheme,
@@ -358,7 +344,7 @@ module.exports = grammar({
       prec.left(30 ,seq($._maybe_expression_unary,"|>" ,$._maybe_expression_unary)), 
       prec.left(30 ,seq($._maybe_expression_unary,"<|" ,$._maybe_expression_unary)), 
       prec.left(29 ,seq($._maybe_expression_unary,"*"  ,$._maybe_expression_unary)), 
-      prec.left(29 ,seq($._maybe_expression_unary,"/"  ,$._maybe_expression_unary)), 
+      //prec.left(29 ,seq($._maybe_expression_unary,"/"  ,$._maybe_expression_unary)), 
       prec.left(29 ,seq($._maybe_expression_unary,"%"  ,$._maybe_expression_unary)), 
       prec.left(28 ,seq($._maybe_expression_unary,"+"  ,$._maybe_expression_unary)), 
       prec.left(28 ,seq($._maybe_expression_unary,"-"  ,$._maybe_expression_unary)), 
@@ -455,9 +441,9 @@ module.exports = grammar({
       $.data_type_constructor_type
     ),
 
-    class_declaration : $ => seq(
+    interface_declaration : $ => seq(
       optional("public"),
-      "class", 
+      "interface", 
       $.top_type_declaration_left ,
       "{",
         repeat(seq($.function_declaration,";")),
@@ -478,7 +464,7 @@ module.exports = grammar({
       optional("public"),
       "instance", 
       field("instance_name",$.local_variable),
-      field("class_name",$.local_variable),
+      field("interface_name",$.local_variable),
       field("types",repeat($._type_atom)),
       "as",
       "{",

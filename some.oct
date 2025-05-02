@@ -3,6 +3,8 @@
 // asdf 
 import unqualified some::dfder::(dser,asdf) as dfs::asdf
 
+
+
 // asfd
 import some() as sfsdf;
 
@@ -14,17 +16,30 @@ public newtype RecordExample a3 b =  Example1 {one:a33};
 
 -- public data Nat a b c d = Z asdf::asdf::sfsdf ASFD sadf asdfsadf dsf (asdf -> asdf) | S Nat;
 
--- f: n3: Nat -> Nat = { 0 }
+-- f: n3: Nat -> Nat = { 0 } 
 
 //Comment
 public data Some asd = asdf ;
 
 v : Nat = {0}
 
-//Some
+{- sadf 
+
+
+sadf 
+
+-}
+{- asfd 
+  saf 
+
+
+
+-}
+
+//  Some ad  Natadd df sdf
 add : forall j .  n:Nat-> m:Nat -> Nat 
 = {
-  case n of {
+  case n a of {
     Z -> m Z,
     v -> v,
     S n2 -> S $ add n2 m asdf j
@@ -43,4 +58,3 @@ add : forall j .  n:Nat-> m:Nat -> Nat
 data a b c d =
   | some a
 ;
-

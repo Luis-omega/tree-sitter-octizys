@@ -16,16 +16,8 @@
                 "name": "import_declaration"
               },
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": ";"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
+                "type": "STRING",
+                "value": ";"
               }
             ]
           }
@@ -76,7 +68,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "class_declaration"
+                "name": "interface_declaration"
               },
               {
                 "type": "SYMBOL",
@@ -243,25 +235,44 @@
         "flags": "u"
       }
     },
+    "module_separator": {
+      "type": "STRING",
+      "value": "/"
+    },
     "module_path": {
-      "type": "TOKEN",
-      "content": {
-        "type": "REPEAT1",
-        "content": {
+      "type": "CHOICE",
+      "members": [
+        {
           "type": "SEQ",
           "members": [
             {
-              "type": "PATTERN",
-              "value": "\\p{XID_Start}(_|\\p{XID_Continue})*",
-              "flags": "u"
+              "type": "SYMBOL",
+              "name": "module_path"
             },
             {
-              "type": "STRING",
-              "value": "::"
+              "type": "SYMBOL",
+              "name": "_identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "module_separator"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "module_separator"
             }
           ]
         }
-      }
+      ]
     },
     "uint": {
       "type": "TOKEN",
@@ -395,7 +406,7 @@
       "type": "TOKEN",
       "content": {
         "type": "STRING",
-        "value": "mutable"
+        "value": "'0|'1|'inf"
       }
     },
     "multiplicity_variable": {
@@ -404,13 +415,13 @@
         "type": "SEQ",
         "members": [
           {
+            "type": "STRING",
+            "value": "'"
+          },
+          {
             "type": "PATTERN",
             "value": "\\p{XID_Start}(_|\\p{XID_Continue})*",
             "flags": "u"
-          },
-          {
-            "type": "STRING",
-            "value": "'"
           }
         ]
       }
@@ -476,133 +487,83 @@
           ]
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "imported_variable"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "local_variable"
-            }
-          ]
+          "type": "FIELD",
+          "name": "path",
+          "content": {
+            "type": "SYMBOL",
+            "name": "module_path"
+          }
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "("
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "import_list"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                },
-                {
-                  "type": "STRING",
-                  "value": ")"
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "FIELD",
+          "name": "imports",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "("
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "import_list"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ")"
+                  }
+                ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "as"
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "imported_variable"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "local_variable"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
-    },
-    "type_base": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "U8"
-        },
-        {
-          "type": "STRING",
-          "value": "U16"
-        },
-        {
-          "type": "STRING",
-          "value": "U32"
-        },
-        {
-          "type": "STRING",
-          "value": "U64"
-        },
-        {
-          "type": "STRING",
-          "value": "I8"
-        },
-        {
-          "type": "STRING",
-          "value": "I16"
-        },
-        {
-          "type": "STRING",
-          "value": "I32"
-        },
-        {
-          "type": "STRING",
-          "value": "I64"
-        },
-        {
-          "type": "STRING",
-          "value": "F32"
-        },
-        {
-          "type": "STRING",
-          "value": "F64"
-        },
-        {
-          "type": "STRING",
-          "value": "Char"
-        },
-        {
-          "type": "STRING",
-          "value": "String"
+          "type": "FIELD",
+          "name": "qualifier",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "as"
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "imported_variable"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "local_variable"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
         }
       ]
     },
@@ -616,6 +577,14 @@
         {
           "type": "STRING",
           "value": "Exception"
+        },
+        {
+          "type": "STRING",
+          "value": "Row"
+        },
+        {
+          "type": "STRING",
+          "value": "Ownership"
         }
       ]
     },
@@ -651,23 +620,6 @@
         {
           "type": "SYMBOL",
           "name": "local_variable"
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "local_variable"
-            },
-            {
-              "type": "STRING",
-              "value": ":"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "kind"
-            }
-          ]
         },
         {
           "type": "SEQ",
@@ -878,10 +830,6 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "type_base"
-        },
-        {
-          "type": "SYMBOL",
           "name": "type_variable"
         },
         {
@@ -895,22 +843,6 @@
         {
           "type": "SYMBOL",
           "name": "type_parens"
-        }
-      ]
-    },
-    "type_application": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_type_atom"
-        },
-        {
-          "type": "REPEAT1",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_type_atom"
-          }
         }
       ]
     },
@@ -957,6 +889,79 @@
         }
       ]
     },
+    "type_application": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_type_atom"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_type_atom"
+          }
+        }
+      ]
+    },
+    "_type_interface_argument": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "type_multiplicity"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "imported_variable"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_type_atom"
+        }
+      ]
+    },
+    "type_interface_constraint": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "interface_name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "type_variable"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "arguments",
+          "content": {
+            "type": "REPEAT",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_type_interface_argument"
+            }
+          }
+        }
+      ]
+    },
+    "type_interface_constraints": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "type_interface_constraint"
+          },
+          {
+            "type": "STRING",
+            "value": "=>"
+          }
+        ]
+      }
+    },
     "type_scheme_forall": {
       "type": "SEQ",
       "members": [
@@ -965,10 +970,14 @@
           "value": "forall"
         },
         {
-          "type": "REPEAT1",
+          "type": "FIELD",
+          "name": "parameters",
           "content": {
-            "type": "SYMBOL",
-            "name": "type_parameter"
+            "type": "REPEAT1",
+            "content": {
+              "type": "SYMBOL",
+              "name": "type_parameter"
+            }
           }
         }
       ]
@@ -983,6 +992,22 @@
         {
           "type": "STRING",
           "value": "."
+        },
+        {
+          "type": "FIELD",
+          "name": "constraints",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "type_interface_constraints"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
         },
         {
           "type": "SYMBOL",
@@ -1861,27 +1886,6 @@
               },
               {
                 "type": "STRING",
-                "value": "/"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_maybe_expression_unary"
-              }
-            ]
-          }
-        },
-        {
-          "type": "PREC_LEFT",
-          "value": 29,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_maybe_expression_unary"
-              },
-              {
-                "type": "STRING",
                 "value": "%"
               },
               {
@@ -2732,7 +2736,7 @@
         }
       ]
     },
-    "class_declaration": {
+    "interface_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -2749,7 +2753,7 @@
         },
         {
           "type": "STRING",
-          "value": "class"
+          "value": "interface"
         },
         {
           "type": "SYMBOL",
@@ -2857,7 +2861,7 @@
         },
         {
           "type": "FIELD",
-          "name": "class_name",
+          "name": "interface_name",
           "content": {
             "type": "SYMBOL",
             "name": "local_variable"

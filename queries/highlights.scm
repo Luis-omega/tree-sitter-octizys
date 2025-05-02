@@ -22,7 +22,6 @@
   "|>"
   "<|"
   "*"
-  "/"
   "%"
   "+"
   "-"
@@ -103,8 +102,6 @@
                    ]
   )?
 )
-
-(type_base  _  @type.builtin)
 
 (kind _ @type.builtin)
 
@@ -257,7 +254,7 @@
 )
 
 ("public"? @keyword
-  "class" @keyword.type
+  "interface" @keyword.type
   _
   "{"
   _

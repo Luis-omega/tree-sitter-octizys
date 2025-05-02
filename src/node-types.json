@@ -20,10 +20,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -146,25 +142,6 @@
     }
   },
   {
-    "type": "class_declaration",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "function_declaration",
-          "named": true
-        },
-        {
-          "type": "top_type_declaration_left",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "data_type",
     "named": true,
     "fields": {},
@@ -237,10 +214,6 @@
           },
           {
             "type": "type_arrow",
-            "named": true
-          },
-          {
-            "type": "type_base",
             "named": true
           },
           {
@@ -690,10 +663,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -921,10 +890,6 @@
       "required": true,
       "types": [
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -1148,10 +1113,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_multiplicity",
           "named": true
         },
@@ -1214,10 +1175,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_multiplicity",
           "named": true
         },
@@ -1262,24 +1219,53 @@
   {
     "type": "import_declaration",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "import_list",
-          "named": true
-        },
-        {
-          "type": "imported_variable",
-          "named": true
-        },
-        {
-          "type": "local_variable",
-          "named": true
-        }
-      ]
+    "fields": {
+      "imports": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "import_list",
+            "named": true
+          }
+        ]
+      },
+      "path": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "module_path",
+            "named": true
+          }
+        ]
+      },
+      "qualifier": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "as",
+            "named": false
+          },
+          {
+            "type": "imported_variable",
+            "named": true
+          },
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1335,16 +1321,6 @@
     "type": "instance_definition",
     "named": true,
     "fields": {
-      "class_name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "local_variable",
-            "named": true
-          }
-        ]
-      },
       "definitions": {
         "multiple": true,
         "required": false,
@@ -1365,14 +1341,20 @@
           }
         ]
       },
+      "interface_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      },
       "types": {
         "multiple": true,
         "required": false,
         "types": [
-          {
-            "type": "type_base",
-            "named": true
-          },
           {
             "type": "type_parens",
             "named": true
@@ -1434,6 +1416,25 @@
     }
   },
   {
+    "type": "interface_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "function_declaration",
+          "named": true
+        },
+        {
+          "type": "top_type_declaration_left",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "kind",
     "named": true,
     "fields": {}
@@ -1461,10 +1462,6 @@
         },
         {
           "type": "type_arrow",
-          "named": true
-        },
-        {
-          "type": "type_base",
           "named": true
         },
         {
@@ -1599,10 +1596,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -1644,6 +1637,25 @@
     "type": "local_variable",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "module_path",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "module_path",
+          "named": true
+        },
+        {
+          "type": "module_separator",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "new_type",
@@ -1946,10 +1958,6 @@
           "named": true
         },
         {
-          "type": "class_declaration",
-          "named": true
-        },
-        {
           "type": "data_type",
           "named": true
         },
@@ -1963,6 +1971,10 @@
         },
         {
           "type": "instance_definition",
+          "named": true
+        },
+        {
+          "type": "interface_declaration",
           "named": true
         },
         {
@@ -2007,10 +2019,6 @@
       "required": true,
       "types": [
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -2042,10 +2050,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -2065,9 +2069,35 @@
     }
   },
   {
-    "type": "type_base",
+    "type": "type_class_constraint",
     "named": true,
-    "fields": {}
+    "fields": {
+      "arguments": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "231?213",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "type_class_constraints",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type_class_constraint",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "type_multiplicity",
@@ -2125,10 +2155,6 @@
         },
         {
           "type": "type_arrow",
-          "named": true
-        },
-        {
-          "type": "type_base",
           "named": true
         },
         {
@@ -2190,10 +2216,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_multiplicity",
           "named": true
         },
@@ -2237,10 +2259,6 @@
           "named": true
         },
         {
-          "type": "type_base",
-          "named": true
-        },
-        {
           "type": "type_parens",
           "named": true
         },
@@ -2270,16 +2288,27 @@
   {
     "type": "type_scheme_forall",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "type_parameter",
-          "named": true
-        }
-      ]
+    "fields": {
+      "constraints": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_class_constraints",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "type_parameter",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2296,10 +2325,6 @@
         },
         {
           "type": "type_arrow",
-          "named": true
-        },
-        {
-          "type": "type_base",
           "named": true
         },
         {
@@ -2343,10 +2368,6 @@
         },
         {
           "type": "type_arrow",
-          "named": true
-        },
-        {
-          "type": "type_base",
           "named": true
         },
         {
@@ -2468,7 +2489,11 @@
     "named": false
   },
   {
-    "type": "/",
+    "type": "231?213",
+    "named": false
+  },
+  {
+    "type": "231?2132",
     "named": false
   },
   {
@@ -2516,6 +2541,10 @@
     "named": false
   },
   {
+    "type": "=>",
+    "named": false
+  },
+  {
     "type": ">=",
     "named": false
   },
@@ -2532,59 +2561,11 @@
     "named": false
   },
   {
-    "type": "Char",
-    "named": false
-  },
-  {
     "type": "Exception",
     "named": false
   },
   {
-    "type": "F32",
-    "named": false
-  },
-  {
-    "type": "F64",
-    "named": false
-  },
-  {
-    "type": "I16",
-    "named": false
-  },
-  {
-    "type": "I32",
-    "named": false
-  },
-  {
-    "type": "I64",
-    "named": false
-  },
-  {
-    "type": "I8",
-    "named": false
-  },
-  {
-    "type": "String",
-    "named": false
-  },
-  {
     "type": "Type",
-    "named": false
-  },
-  {
-    "type": "U16",
-    "named": false
-  },
-  {
-    "type": "U32",
-    "named": false
-  },
-  {
-    "type": "U64",
-    "named": false
-  },
-  {
-    "type": "U8",
     "named": false
   },
   {
@@ -2640,10 +2621,6 @@
     "named": true
   },
   {
-    "type": "class",
-    "named": false
-  },
-  {
     "type": "data",
     "named": false
   },
@@ -2676,6 +2653,10 @@
     "named": false
   },
   {
+    "type": "interface",
+    "named": false
+  },
+  {
     "type": "let",
     "named": false
   },
@@ -2696,7 +2677,7 @@
     "named": true
   },
   {
-    "type": "module_path",
+    "type": "module_separator",
     "named": true
   },
   {

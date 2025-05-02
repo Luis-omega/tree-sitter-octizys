@@ -1,6 +1,9 @@
-- Agregar locals
-- Agregar effectos
-- Agregar record update syntax
-- Investigar mas sobre indentation?
+- [x] Add locals
+- [ ] Add class/constrains quantifier at type schemes `forall a. Class a => ...`
+- [ ] Add import of constructors and instances `import a (some,)`
+- [ ] Add Fields to rules
+- [ ] Add effects or exception rules 
+- [ ] Add record update syntax
+- [x] Add instances 
+- [x] Indentation
 - Add directives (like `ignore format` and `inline` or `derive`, sugested as `"#"$.identifier(repeat($.identifier, optional(seq("=", $.directive_val) )))`
-
