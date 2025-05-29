@@ -71,12 +71,12 @@
   "in" @keyword.function
 )
 
-(parameter_alone
+(inner_parameter_alone
   (local_variable) @variable.parameter
 )
 
 
-(parameter_with_type
+(inner_parameter_with_type
   (local_variable) @variable.parameter
   ":"
   (_) @type
@@ -95,6 +95,12 @@
   "forall" @keyword.modifier
 )
 
+(definition_type_annotation 
+  ":"
+  scheme_start: (_)?
+  parameters: ((_) "|-" @keyword.function)
+)
+
 
 (definition
   name: (local_variable) @function
@@ -104,16 +110,12 @@
 (expression_function
   "\\" @keyword.function
   (_)
-  "->" @keyword.function
+  "|-" @keyword.function
   (_)
 )
 
 (expression_application
   function: (expression_variable) @function.call
   arguments: (_)+
-)
-
-(parameter_alone
-  (local_variable) @variable.parameter
 )
 

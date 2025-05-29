@@ -1,10 +1,10 @@
 (expression_let) @local.scope
 
-(parameter_alone
+(inner_parameter_alone
   (local_variable) @local.definition.parameter
 )
 
-(parameter_with_type
+(inne_parameter_with_type
   (local_variable) @local.definition.parameter
   ":"
   (_) @local.definition.associated

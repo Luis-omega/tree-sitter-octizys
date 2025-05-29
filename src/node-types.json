@@ -48,44 +48,6 @@
     }
   },
   {
-    "type": "definition_parameter",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "parameter_alone",
-          "named": true
-        },
-        {
-          "type": "parameter_with_type",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "definition_parameters",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "definition_parameter",
-          "named": true
-        },
-        {
-          "type": "definition_parameters",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "definition_type_annotation",
     "named": true,
     "fields": {
@@ -104,7 +66,7 @@
         "required": false,
         "types": [
           {
-            "type": "definition_parameters",
+            "type": "parameters",
             "named": true
           }
         ]
@@ -188,7 +150,11 @@
           "named": true
         },
         {
-          "type": "function_parameter",
+          "type": "inner_parameter",
+          "named": true
+        },
+        {
+          "type": "parameters",
           "named": true
         }
       ]
@@ -314,7 +280,7 @@
     }
   },
   {
-    "type": "function_parameter",
+    "type": "inner_parameter",
     "named": true,
     "fields": {},
     "children": {
@@ -322,23 +288,18 @@
       "required": true,
       "types": [
         {
-          "type": "parameter_alone",
+          "type": "inner_parameter_alone",
           "named": true
         },
         {
-          "type": "parameter_with_type",
+          "type": "inner_parameter_with_type",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "local_variable",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "parameter_alone",
+    "type": "inner_parameter_alone",
     "named": true,
     "fields": {},
     "children": {
@@ -353,7 +314,7 @@
     }
   },
   {
-    "type": "parameter_with_type",
+    "type": "inner_parameter_with_type",
     "named": true,
     "fields": {},
     "children": {
@@ -366,6 +327,45 @@
         },
         {
           "type": "type_arrow",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "local_variable",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "parameter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inner_parameter",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parameters",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "inner_parameter",
+          "named": true
+        },
+        {
+          "type": "parameter",
           "named": true
         }
       ]
@@ -478,10 +478,6 @@
   },
   {
     "type": "(",
-    "named": false
-  },
-  {
-    "type": "(,",
     "named": false
   },
   {
@@ -619,5 +615,9 @@
   {
     "type": "uint",
     "named": true
+  },
+  {
+    "type": "|-",
+    "named": false
   }
 ]

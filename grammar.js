@@ -128,19 +128,17 @@ module.exports = grammar({
       ,field("arguments",repeat($._expression_atom))
     ),
 
-    parameter_alone : $ => $.local_variable,
-    
-    parameter_with_type : $ => seq($.local_variable,seq(":",$._type_expression)),
+    inner_parameter_alone : $ =>$.local_variable,
 
-    definition_parameter : $ => choice($.parameter_alone,$.parameter_with_type),
+    inner_parameter_with_type : $ =>seq($.local_variable,":",$._type_expression),
 
-    function_parameter : $ => choice($.parameter_alone,seq("(,",$.parameter_with_type,")")),
+    inner_parameter : $=>choice($.inner_parameter_alone,$.inner_parameter_with_type),
 
-    definition_parameters  : $ => 
-      choice( 
-        seq($.definition_parameter,","),
-        seq($.definition_parameters, seq($.definition_parameter,","))
-      ),
+    parameter : $ => seq(",",$.inner_parameter),
+
+    parameters : $ => 
+      seq($.inner_parameter ,repeat($.parameter)),
+
 
     scheme_start : $ => seq("forall", 
       field("type_arguments",repeat1($.local_variable)), 
@@ -149,7 +147,7 @@ module.exports = grammar({
     definition_type_annotation : $ => seq(
         ":", 
       optional(field("scheme_start", $.scheme_start)),
-      optional(field("parameters",$.definition_parameters)),
+      optional(seq(field("parameters",$.parameters),"|-")),
       field("output_type",$._type_expression))  ,
 
     definition : $ => seq(
@@ -161,7 +159,7 @@ module.exports = grammar({
       $._expression
     ),
 
-    expression_function : $ => seq("\\", repeat1($.function_parameter)  ,"->",$._expression),
+    expression_function : $ => seq("\\", optional($.parameters) , $.inner_parameter ,"|-",$._expression),
 
     expression_if : $ => 
       seq("if",$._expression,"then",$._expression,"else",$._expression),
