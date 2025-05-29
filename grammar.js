@@ -136,18 +136,26 @@ module.exports = grammar({
 
     function_parameter : $ => choice($.parameter_alone,seq("(,",$.parameter_with_type,")")),
 
-    definition_parameters  : $ => choice(
-      $.definition_parameter, 
-      seq($.definition_parameters,",",$.definition_parameter)
-    ),
+    definition_parameters  : $ => 
+      choice( 
+        seq($.definition_parameter,","),
+        seq($.definition_parameters, seq($.definition_parameter,","))
+      ),
+
+    scheme_start : $ => seq("forall", 
+      field("type_arguments",repeat1($.local_variable)), 
+      "." ),
+
+    definition_type_annotation : $ => seq(
+        ":", 
+      optional(field("scheme_start", $.scheme_start)),
+      optional(field("parameters",$.definition_parameters)),
+      field("output_type",$._type_expression))  ,
 
     definition : $ => seq(
       field("name",$.local_variable),
       optional(
-        choice(
-          seq(":",$.definition_parameters, optional(seq(",",field("output_type",$._type_atom_no_var)))),
-          seq(":",field("output_type",$._type_atom_no_var))
-        )
+        field("definition_type_annotation",$.definition_type_annotation)
       ),
       "=",
       $._expression

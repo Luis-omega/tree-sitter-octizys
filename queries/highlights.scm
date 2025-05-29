@@ -9,6 +9,7 @@
   ":"
   ";"
   "="
+  "."
  ] @punctuation.delimiter
 
 ((line_comment_hypen) @comment)
@@ -74,14 +75,29 @@
   (local_variable) @variable.parameter
 )
 
+
 (parameter_with_type
   (local_variable) @variable.parameter
   ":"
   (_) @type
 )
 
+
+(scheme_start
+  "forall"
+  type_arguments: (
+                   (local_variable)
+                   @type.definition
+                   )+
+)
+
+(scheme_start
+  "forall" @keyword.modifier
+)
+
+
 (definition
-  (local_variable) @function
+  name: (local_variable) @function
 )
 
 

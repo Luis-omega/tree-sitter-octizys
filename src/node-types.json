@@ -3,6 +3,16 @@
     "type": "definition",
     "named": true,
     "fields": {
+      "definition_type_annotation": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "definition_type_annotation",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -12,30 +22,12 @@
             "named": true
           }
         ]
-      },
-      "output_type": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "type_literal",
-            "named": true
-          },
-          {
-            "type": "type_parens",
-            "named": true
-          }
-        ]
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
-        {
-          "type": "definition_parameters",
-          "named": true
-        },
         {
           "type": "expression_application",
           "named": true
@@ -91,6 +83,42 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "definition_type_annotation",
+    "named": true,
+    "fields": {
+      "output_type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type_arrow",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "definition_parameters",
+            "named": true
+          }
+        ]
+      },
+      "scheme_start": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "scheme_start",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -344,6 +372,22 @@
     }
   },
   {
+    "type": "scheme_start",
+    "named": true,
+    "fields": {
+      "type_arguments": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "local_variable",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "source_file",
     "named": true,
     "root": true,
@@ -453,6 +497,10 @@
     "named": false
   },
   {
+    "type": ".",
+    "named": false
+  },
+  {
     "type": ":",
     "named": false
   },
@@ -526,6 +574,10 @@
   },
   {
     "type": "else",
+    "named": false
+  },
+  {
+    "type": "forall",
     "named": false
   },
   {
