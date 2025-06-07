@@ -4,7 +4,7 @@
   (local_variable) @local.definition.parameter
 )
 
-(inne_parameter_with_type
+(inner_parameter_with_type
   (local_variable) @local.definition.parameter
   ":"
   (_) @local.definition.associated

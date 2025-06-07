@@ -280,6 +280,32 @@
     }
   },
   {
+    "type": "import_statement",
+    "named": true,
+    "fields": {
+      "alias": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "logic_path",
+            "named": true
+          }
+        ]
+      },
+      "origin": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "logic_path",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "inner_parameter",
     "named": true,
     "fields": {},
@@ -334,6 +360,11 @@
   },
   {
     "type": "local_variable",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "logic_path",
     "named": true,
     "fields": {}
   },
@@ -413,6 +444,10 @@
       "types": [
         {
           "type": "definition",
+          "named": true
+        },
+        {
+          "type": "import_statement",
           "named": true
         }
       ]
@@ -497,6 +532,10 @@
     "named": false
   },
   {
+    "type": "/",
+    "named": false
+  },
+  {
     "type": ":",
     "named": false
   },
@@ -526,6 +565,10 @@
   },
   {
     "type": "\\",
+    "named": false
+  },
+  {
+    "type": "as",
     "named": false
   },
   {
@@ -578,6 +621,10 @@
   },
   {
     "type": "if",
+    "named": false
+  },
+  {
+    "type": "import",
     "named": false
   },
   {

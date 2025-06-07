@@ -59,6 +59,7 @@ module.exports = grammar({
 
 
     _identifier : $ => token(identifier_),
+    _module_separator: $=> token("/"),
 
     //module_path : $ => prec.right(repeat1($.module_path_item)),
     //token(repeat1(seq(identifier_,"::"))),
@@ -76,6 +77,8 @@ module.exports = grammar({
     //character : $ => token(/'.'/u),
 
     local_variable : $ => $._identifier,
+
+    logic_path :$ => choice(seq($._identifier,$._module_separator), seq($._identifier,$._module_separator,$.logic_path)),
     
     //TODO: add records
     //selector : $ => token(seq(".",identifier_)),
@@ -175,6 +178,18 @@ module.exports = grammar({
       $.expression_application,
     ),
     
-    top_item : $ => seq($.definition,";")
+//--------------------------Module level ----------------------------------
+    import_logic_path : $ => seq(optional($.logic_path),$._identifier),
+
+    import_statement : $  =>  seq(
+      "import",
+      field("origin",$.import_logic_path),
+      optional(seq(
+        "as",
+        field("alias",$.import_logic_path)
+      ))
+    ),
+
+    top_item : $ => seq(choice($.import_statement,$.definition),";")
   }
 });

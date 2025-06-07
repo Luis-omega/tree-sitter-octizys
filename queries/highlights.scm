@@ -10,7 +10,9 @@
   ";"
   "="
   "."
+  "/"
  ] @punctuation.delimiter
+
 
 ((line_comment_hypen) @comment)
 ((line_comment_hypen)+ @comment.todo (#any-vim-match?  @comment.todo "^-- *TODO"))
@@ -32,6 +34,9 @@
 ((block_documentation1) @spell)
 ((block_documentation2) @spell)
 ((block_documentation3) @spell)
+
+((logic_path) @module
+)
 
 
 (type_literal
@@ -118,4 +123,9 @@
   function: (expression_variable) @function.call
   arguments: (_)+
 )
+
+
+(import_statement
+  "import" @keyword.import
+ )
 

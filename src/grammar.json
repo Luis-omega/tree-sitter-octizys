@@ -162,6 +162,13 @@
         "flags": "u"
       }
     },
+    "_module_separator": {
+      "type": "TOKEN",
+      "content": {
+        "type": "STRING",
+        "value": "/"
+      }
+    },
     "uint": {
       "type": "TOKEN",
       "content": {
@@ -173,6 +180,41 @@
     "local_variable": {
       "type": "SYMBOL",
       "name": "_identifier"
+    },
+    "logic_path": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_module_separator"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_module_separator"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "logic_path"
+            }
+          ]
+        }
+      ]
     },
     "type_literal": {
       "type": "CHOICE",
@@ -671,12 +713,84 @@
         }
       ]
     },
+    "import_logic_path": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "logic_path"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_identifier"
+        }
+      ]
+    },
+    "import_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "import"
+        },
+        {
+          "type": "FIELD",
+          "name": "origin",
+          "content": {
+            "type": "SYMBOL",
+            "name": "import_logic_path"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "as"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "alias",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "import_logic_path"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
     "top_item": {
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "definition"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "import_statement"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "definition"
+            }
+          ]
         },
         {
           "type": "STRING",
