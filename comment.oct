@@ -1,2 +1,9 @@
 // asdf
 -- | asdf 
+--
+--
+
+a: forall j . Int = if 1 then 2 else j a/bc/d e f ;
+
+import a/b/c as a;
+

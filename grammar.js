@@ -78,7 +78,11 @@ module.exports = grammar({
 
     local_variable : $ => $._identifier,
 
-    logic_path :$ => choice(seq($._identifier,$._module_separator), seq($._identifier,$._module_separator,$.logic_path)),
+    _logic_path_item : $ => seq("/",$._identifier),
+
+    _logic_path_item_list : $ => choice($._logic_path_item, seq($._logic_path_item_list,$._logic_path_item)),
+
+    logic_path :$ => seq($._identifier,$._logic_path_item_list),
     
     //TODO: add records
     //selector : $ => token(seq(".",identifier_)),
@@ -93,18 +97,14 @@ module.exports = grammar({
 
     type_variable : $ => choice(
       $.local_variable, 
+      $.logic_path
     ),
 
     type_parens : $ => seq("(",$._type_expression,")"),
 
-    _type_atom_no_var : $ => choice(
+    _type_atom : $ => choice(
       $.type_literal,
       $.type_parens,
-    ),
-
-
-    _type_atom : $ => choice(
-      $._type_atom_no_var,
       $.type_variable,
     ),
 
@@ -116,7 +116,7 @@ module.exports = grammar({
 
     expression_literal : $ => choice($.uint,"True","False"),
 
-    expression_variable : $ => $.local_variable,
+    expression_variable : $ => choice($.local_variable,$.logic_path),
 
     expression_parens : $ => seq("(",$._expression,optional(seq(":",$._type_expression)),")"),
 
@@ -179,7 +179,7 @@ module.exports = grammar({
     ),
     
 //--------------------------Module level ----------------------------------
-    import_logic_path : $ => seq(optional($.logic_path),$._identifier),
+    import_logic_path : $ => choice($.logic_path,$._identifier),
 
     import_statement : $  =>  seq(
       "import",
